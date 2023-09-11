@@ -2,11 +2,10 @@ import 'package:cook_log/calendar_page.dart';
 import 'package:cook_log/upload_page.dart';
 import 'package:cook_log/user_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  // const envFile = String.fromEnvironment('env');
-  await dotenv.load(fileName: '.env');
+  // await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Home(),
+      home: const Home(),
     );
   }
 }
@@ -38,19 +37,19 @@ class _HomeState extends State<Home> {
 
   // 切り替える画面のリスト
   List<Widget> display = [UserPage(), UploadPage(), CalendarPage()];
-  List<String> header = ["プロフィール", "新規登録", "カレンダー"];
+  List<String> header = ["Profile", "Today's Cook", ""];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(header[selectedIndex])),
         body: display[selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_none), label: 'お知らせ'),
-            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'マイページ'),
+                icon: Icon(Icons.account_circle), label: 'ホーム'),
+            BottomNavigationBarItem(icon: Icon(Icons.mode), label: '投稿'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_month), label: 'カレンダー'),
           ],
           // 現在選択されているフッターメニューのインデックス
           currentIndex: selectedIndex,
