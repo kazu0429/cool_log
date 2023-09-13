@@ -1,4 +1,5 @@
 import 'package:cook_log/calendar_page.dart';
+import 'package:cook_log/login_page.dart';
 import 'package:cook_log/upload_page.dart';
 import 'package:cook_log/user_page.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Home(),
+      home: LoginPage(),
     );
   }
 }
