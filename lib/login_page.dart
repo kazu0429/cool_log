@@ -1,4 +1,6 @@
+import 'package:cook_log/main.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -6,25 +8,26 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpPage> {
-  String _email = '';
-  String _password = '';
+  final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
+  String? _email = '';
+  String? _password = '';
 
   _alertDialog() {
     showDialog(
         context: context,
-        builder: (context) => const AlertDialog(
-              title: Text('Welcome to App！'),
-              content: Text(
+        builder: (context) => AlertDialog(
+              title: const Text('Welcome to App！'),
+              content: const Text(
                   '登録が完了しました！メールアドレスとパスワードは忘れないようにパスワードマネージャーなどを利用して保存しておきましょう。'),
               actions: [
-                // TextButton(
-                //   onPressed: () {
-                //     Navigator.of(context).pop();
-                //     Navigator.push(context,
-                //         MaterialPageRoute(builder: (context) => FirstPage()));
-                //   },
-                //   child: const Text("Next!"),
-                // )
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const Home()));
+                  },
+                  child: const Text("Next!"),
+                )
               ],
             ));
   }
@@ -37,56 +40,119 @@ class _SignUpState extends State<SignUpPage> {
       ),
       body: Center(
         child: Container(
-          width: 300,
-          height: double.infinity,
-          padding: const EdgeInsets.all(8),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            SizedBox(
-              width: 300,
-              height: 200,
-              child: Image.asset(
-                'images/undraw_welcome_cats_thqn.png',
-                fit: BoxFit.contain,
-              ),
-            ),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'email'),
-              onChanged: (String value) {
-                setState(() {
-                  _email = value;
-                });
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'password'),
-              onChanged: (String value) {
-                setState(() {
-                  _password = value;
-                });
-              },
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              child: const Text('新規作成'),
-              onPressed: () {},
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton(
-                onPressed: () async {
-                  await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                },
-                child: const Text('login')),
-          ]),
+            width: 300,
+            height: double.infinity,
+            padding: const EdgeInsets.all(8),
+            child: Form(
+                key: _signUpFormKey,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 300,
+                        height: 200,
+                        child: Image.asset(
+                          'images/undraw_welcome_cats_thqn.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      _emailTextField(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      _passwordTextField(),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      _signUpButton(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()));
+                          },
+                          child: const Text('login')),
+                    ]))),
+      ),
+    );
+  }
+
+  Widget _emailTextField() {
+    return TextFormField(
+      decoration: InputDecoration(hintText: "email"),
+      onSaved: (value) {
+        setState(() {
+          _email = value;
+        });
+      },
+      validator: (value) {
+        bool _result = value!.contains(
+          RegExp(
+              r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"),
+        );
+        return _result ? null : "正い形式のemailを入力してください";
+      },
+    );
+  }
+
+  Widget _passwordTextField() {
+    return TextFormField(
+      obscureText: true,
+      decoration: InputDecoration(hintText: "password"),
+      onSaved: (value) {
+        setState(() {
+          _password = value;
+        });
+      },
+      validator: (value) {
+        return value!.length >= 8 ? null : "8文字以上のパスワードにしてください";
+      },
+    );
+  }
+
+  Widget _signUpButton() {
+    void _signUpUser() async {
+      if (_signUpFormKey.currentState!.validate()) {
+        _signUpFormKey.currentState!.save();
+        try {
+          final User? user = (await FirebaseAuth.instance
+                  .createUserWithEmailAndPassword(
+                      email: _email as String, password: _password as String))
+              .user;
+          debugPrint("$_email, $_password");
+          if (user != null) {
+            debugPrint("ユーザ登録しました ${user.email}, ${user.uid}");
+          }
+          if (!mounted) return;
+          _alertDialog();
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'weak-password') {
+            debugPrint('The password provided is too weak.');
+          } else if (e.code == 'email-already-in-use') {
+            debugPrint('The account already exists for that email.');
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+      alignment: Alignment.center,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          side: const BorderSide(),
         ),
+        onPressed: _signUpUser,
+        child: const Text('Sign UP!'),
       ),
     );
   }
@@ -185,9 +251,23 @@ class _LoginState extends State<LoginPage> {
   }
 
   Widget _loginButton() {
-    void _loginUser() {
+    void _loginUser() async {
       if (_loginFormKey.currentState!.validate()) {
         _loginFormKey.currentState!.save();
+        try {
+          final User? user = (await FirebaseAuth.instance
+                  .signInWithEmailAndPassword(
+                      email: _email as String, password: _password as String))
+              .user;
+          if (user != null) {
+            debugPrint("ログインしました ${user.email} , ${user.uid}");
+          }
+          if (!mounted) return;
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const Home()));
+        } catch (e) {
+          debugPrint(e.toString());
+        }
       }
     }
 
