@@ -1,6 +1,9 @@
 import 'package:cook_log/login_page.dart';
 import 'package:flutter/material.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class UserPage extends StatelessWidget {
   const UserPage({super.key});
@@ -34,18 +37,17 @@ class UserPage extends StatelessWidget {
               )),
         ),
         SliverToBoxAdapter(
-          child: Container(
-            child: Center(
-              child: TextButton(
-                child: const Text("サインアウト"),
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  await Navigator.of(context)
-                      .pushReplacement(MaterialPageRoute(builder: (context) {
-                    return LoginPage();
-                  }));
-                },
-              ),
+          child: Center(
+            child: TextButton(
+              child: const Text("サインアウト"),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+
+                await Navigator.of(context)
+                    .pushReplacement(MaterialPageRoute(builder: (context) {
+                  return LoginPage();
+                }));
+              },
             ),
           ),
         )
