@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
   @override
   State<SignUpPage> createState() => _SignUpState();
 }
@@ -12,13 +13,49 @@ class _SignUpState extends State<SignUpPage> {
   String? _email = '';
   String? _password = '';
 
+  String? _name = '';
+
   _alertDialog() {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Welcome to App！'),
-              content: const Text(
-                  '登録が完了しました！メールアドレスとパスワードは忘れないようにパスワードマネージャーなどを利用して保存しておきましょう。'),
+              content: SizedBox(
+                  height: 200,
+                  child: Column(children: [
+                    const Text(
+                        '登録が完了しました！メールアドレスとパスワードは忘れないようにパスワードマネージャーなどを利用して保存しておきましょう。'),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    const Text('アプリ内でのアイコンとユーザー名を決めてください'),
+                    Row(
+                      children: [
+                        IconButton(
+                            iconSize: 30,
+                            onPressed: () {},
+                            icon: const Icon(Icons.account_circle)),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: const InputDecoration(hintText: "name"),
+                            onSaved: (value) {
+                              setState(() {
+                                _name = value;
+                              });
+                            },
+                            validator: (value) {
+                              return value!.length >= 4
+                                  ? null
+                                  : "4文字以上の名前を使用してください";
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ])),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -69,11 +106,16 @@ class _SignUpState extends State<SignUpPage> {
                         height: 10,
                       ),
                       TextButton(
+                          onPressed: () {
+                            _alertDialog();
+                          },
+                          child: const Text("ユーザー名")),
+                      TextButton(
                           onPressed: () async {
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => LoginPage()));
+                                    builder: (context) => const LoginPage()));
                           },
                           child: const Text('login')),
                     ]))),
@@ -83,18 +125,18 @@ class _SignUpState extends State<SignUpPage> {
 
   Widget _emailTextField() {
     return TextFormField(
-      decoration: InputDecoration(hintText: "email"),
+      decoration: const InputDecoration(hintText: "email"),
       onSaved: (value) {
         setState(() {
           _email = value;
         });
       },
       validator: (value) {
-        bool _result = value!.contains(
+        bool result = value!.contains(
           RegExp(
               r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"),
         );
-        return _result ? null : "正い形式のemailを入力してください";
+        return result ? null : "正い形式のemailを入力してください";
       },
     );
   }
@@ -102,7 +144,7 @@ class _SignUpState extends State<SignUpPage> {
   Widget _passwordTextField() {
     return TextFormField(
       obscureText: true,
-      decoration: InputDecoration(hintText: "password"),
+      decoration: const InputDecoration(hintText: "password"),
       onSaved: (value) {
         setState(() {
           _password = value;
@@ -159,6 +201,8 @@ class _SignUpState extends State<SignUpPage> {
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginState();
 }
@@ -208,7 +252,7 @@ class _LoginState extends State<LoginPage> {
                           await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SignUpPage()));
+                                  builder: (context) => const SignUpPage()));
                         },
                         child: const Text('signup'))
                   ],
@@ -219,18 +263,18 @@ class _LoginState extends State<LoginPage> {
 
   Widget _emailTextField() {
     return TextFormField(
-      decoration: InputDecoration(hintText: "email"),
+      decoration: const InputDecoration(hintText: "email"),
       onSaved: (value) {
         setState(() {
           _email = value;
         });
       },
       validator: (value) {
-        bool _result = value!.contains(
+        bool result = value!.contains(
           RegExp(
               r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"),
         );
-        return _result ? null : "正い形式のemailを入力してください";
+        return result ? null : "正い形式のemailを入力してください";
       },
     );
   }
@@ -238,7 +282,7 @@ class _LoginState extends State<LoginPage> {
   Widget _passwordTextField() {
     return TextFormField(
       obscureText: true,
-      decoration: InputDecoration(hintText: "password"),
+      decoration: const InputDecoration(hintText: "password"),
       onSaved: (value) {
         setState(() {
           _password = value;
