@@ -55,7 +55,11 @@ class _HomeState extends State<Home> {
   int selectedIndex = 0;
 
   // 切り替える画面のリスト
-  List<Widget> display = [UserPage(), UploadPage(), CalendarPage()];
+  List<Widget> display = [
+    const UserPage(),
+    const UploadPage(),
+    const CalendarPage()
+  ];
   List<String> header = ["Profile", "Today's Cook", ""];
 
   @override
